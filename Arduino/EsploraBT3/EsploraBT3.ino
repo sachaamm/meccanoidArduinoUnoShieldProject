@@ -76,6 +76,8 @@ void loop()
     
   }
 
+  Serial.println(directionJoystick);
+  
   sliderState = Esplora.readSlider() / 256; // 4 ANIMATION STATES 
 
   switch(sliderState){
@@ -111,7 +113,7 @@ void loop()
 
   
   
- //delay(20);
+ //delay(50);
   
 
   

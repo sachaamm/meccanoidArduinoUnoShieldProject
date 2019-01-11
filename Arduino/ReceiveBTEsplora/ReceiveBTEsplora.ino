@@ -225,7 +225,8 @@ MeccaMove animations[12] = {
 };
 
 
-      
+int cycleValueMax = 6; 
+int cycleValue = 0; 
 
 void setup() {
 
@@ -257,7 +258,7 @@ void loop() {
     // use positions variables to set servp positions
    if(playAnimation){
 
-      if( millis() % animationCycle == 0){ 
+      if( millis() % animationCycle == 0 && cycleValue < cycleValueMax){ 
         
         int animationIndex = (sliderState * 3 + buttonState); // 0 0 : 0 / 1 / 2 
 
@@ -286,6 +287,7 @@ void loop() {
 
       
         frameIndex++;
+        cycleValue++;
         
       }
       //digitalWrite(yellowLed,HIGH);
@@ -348,37 +350,44 @@ void readBTInstructions(int messageIndex,char c){
 
     
     if( c == 'l' )  {
-      //relayTurnClockwise();
-      relayMoveForward();
+      relayTurnClockwise();
+      //relayMoveForward();
       playAnimation = false;
       resetServo();
     }
     if( c == 'r' ){
-      //relayTurnCounterClockwise();
-      relayMoveBackward();
+      relayTurnCounterClockwise();
+      //relayMoveBackward();
       playAnimation = false;
       resetServo();
     }
     if( c == 'd' ){
+      relayMoveForward();
       //relayMoveBackward();
-      relayTurnClockwise();
+      //relayTurnClockwise();
       playAnimation = false;
       resetServo();
     }
     if( c == 'u' ){
+      relayMoveBackward();
       //relayMoveForward();
-      relayTurnCounterClockwise();
+      //relayTurnCounterClockwise();
       playAnimation = false;
       resetServo();
     }
-    if( c == 'x' )  relayIdle();
+    if( c == 'x' ){
+      relayIdle();
+      digitalWrite(yellowLed,HIGH);
+    }
 
   }
 
   if(messageIndex == 1){
     // READ BUTTONS VALUE
    
-    digitalWrite(greenLed,LOW); 
+     
+
+    cycleValue = 0;
 
     if( c == 'x' ){
   
@@ -398,7 +407,7 @@ void readBTInstructions(int messageIndex,char c){
     if( c == '4') {
       resetServo();
       playAnimation = false;
-      
+      relayIdle();
     }
       
   }
@@ -410,6 +419,10 @@ void readBTInstructions(int messageIndex,char c){
     if(buttonState == '1' || buttonState == '2' || buttonState == '3' ){
         playAnimation = true;
         //animateMecca(c,buttonState);
+    }
+
+    if(buttonState == '4'){
+      //relayIdle();
     }
 
     if(c == 3){
@@ -445,10 +458,10 @@ void resetServo(){
 void relayIdle(){
 
    // IDLE
-   digitalWrite(relayPinA,HIGH);
-   digitalWrite(relayPinB,HIGH);
-   digitalWrite(relayPinC,HIGH);
-   digitalWrite(relayPinD,HIGH);
+   digitalWrite(relayPinA, LOW);
+   digitalWrite(relayPinB, LOW);
+   digitalWrite(relayPinC, LOW);
+   digitalWrite(relayPinD, LOW);
 
 }
 
