@@ -225,14 +225,8 @@ MeccaMove animations[12] = {
 };
 
 
-<<<<<<< HEAD
 int cycleValueMax = 6; 
 int cycleValue = 0; 
-=======
-
-
-      
->>>>>>> e1af4faf6d5e16a8fd60b083239cba0d929a864f
 
 void setup() {
 
