@@ -20,7 +20,7 @@ youtube link
    **ReceiveBTESplora_Servos/** is for Arduino B
   
 - Connect wires following the schematic picture for your 2 Arduino and your HM10 device
-![alt text](https://github.com/sachaamm/meccanoidArduinoUnoShieldProject/blob/master/wikiPictures/eagle_2019-01-22_17-27-22.png)
+![alt text](https://github.com/sachaamm/meccanoidArduinoUnoShieldProject/blob/master/wikiPictures/eagle_2019-01-22_17-27-2222.png)
 
 
 - Connect HM10 master bluetooth device to your Esplora controller following this picture 
