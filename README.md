@@ -1,4 +1,4 @@
-## ARDUINO SHIELD FOR MECCANOID PERSONNAL ROBOT PROJECT
+## Meccanoid Personnal Robot Arduino PROJECT
 
 ### Overview
 
