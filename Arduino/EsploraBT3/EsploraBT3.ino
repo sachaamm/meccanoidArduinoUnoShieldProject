@@ -1,3 +1,5 @@
+// The code to upload on your Esplora controller
+
 #include <SoftwareSerial.h> 
 #include <Esplora.h> 
 

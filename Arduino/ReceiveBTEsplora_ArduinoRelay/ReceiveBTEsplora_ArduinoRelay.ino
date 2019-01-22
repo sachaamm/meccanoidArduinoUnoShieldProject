@@ -1,3 +1,4 @@
+// The code to upload on Arduino B ( Relay H-Bridge controller ) 
 #include "MeccaBrain.h"
 
 MeccaBrain head(11);
@@ -24,9 +25,9 @@ bool debugMessageProcess = false;
 
 //RELAY
 int relayPinA = 2;
-int relayPinB = 3;
-int relayPinC = 4;
-int relayPinD = 5;
+int relayPinB = 4;
+int relayPinC = 6;
+int relayPinD = 8;
 bool debugRelay = false;
 
 
@@ -225,18 +226,24 @@ MeccaMove animations[12] = {
 };
 
 
-int pin1Moteur1=12; //pin de commande moteur 1
-int pin2Moteur1=8; // pin de commande moteur 1
-int pinPMoteur1=11;// pin PWM moteur 1
-int pin1Moteur2=2; // pin de commande moteur 2
-int pin2Moteur2=4; // pin de commande moteur 2
-int pinPMoteur2=5; // pin PWM moteur 2
+
+int cycleValueMax = 6; 
+int cycleValue = 0; 
+
+
+#include <SoftwareSerial.h>
+
+SoftwareSerial mySerial(10, 11); // RX, TX
+
+      
 
 void setup() {
 
   // Serial is getting data from bt- HM10
   Serial.begin(9600);
+  mySerial.begin(9600);
 
+  
   // Relay pin to OUTPUT
   pinMode(relayPinA, OUTPUT);
   pinMode(relayPinB, OUTPUT);
@@ -247,13 +254,8 @@ void setup() {
   pinMode(redLed,OUTPUT);
   pinMode(greenLed,OUTPUT);
   pinMode(yellowLed,OUTPUT);
-  
-  pinMode(pin1Moteur1,OUTPUT);
-  pinMode(pin2Moteur1,OUTPUT);
-  pinMode(pinPMoteur1,OUTPUT);
-  pinMode(pin1Moteur2,OUTPUT);
-  pinMode(pin2Moteur2,OUTPUT);
-  pinMode(pinPMoteur2,OUTPUT);
+
+  pinMode(led,OUTPUT);
 
   //DEFAULT POSITION
   relayIdle();
@@ -262,69 +264,32 @@ void setup() {
 
 
 
-
-
-
 void loop() {
 
 
     
-    // use positions variables to set servp positions
-   if(playAnimation){
-
-      if( millis() % animationCycle == 0){ 
-        
-        int animationIndex = (sliderState * 3 + buttonState); // 0 0 : 0 / 1 / 2 
-
-        MeccaMove mm = animations[animationIndex];
-        
-        int lA = mm.leftArmAPosition[frameIndex % (sizeof(mm.leftArmAPosition)/2) ];
-        int lB = mm.leftArmBPosition[frameIndex % (sizeof(mm.leftArmBPosition)/2) ];
-        int lC = mm.leftArmCPosition[frameIndex % (sizeof(mm.leftArmCPosition)/2) ];
-        int rA = mm.rightArmAPosition[frameIndex % (sizeof(mm.rightArmAPosition)/2) ];
-        int rB = mm.rightArmBPosition[frameIndex % (sizeof(mm.rightArmBPosition)/2) ];
-        int rC = mm.rightArmCPosition[frameIndex % (sizeof(mm.rightArmCPosition)/2) ];
-    
-        int hA = mm.headAPosition[frameIndex % (sizeof(mm.headAPosition)/2)];
-        int hB = mm.headBPosition[frameIndex % (sizeof(mm.headBPosition)/2)];
-
-
-        byte r = mm.headColor[0];
-        byte g = mm.headColor[1];
-        byte b = mm.headColor[2];
-        byte d = mm.headColor[3];
-        
-        
-        updateServoPosition(&leftArm,lA,lB,lC);
-        updateServoPosition(&rightArm,rA,rB,rC);
-        updateHeadServoPosition(&head,hA,hB,r,g,b,d);
-
-      
-        frameIndex++;
-        
-      }
-      //digitalWrite(yellowLed,HIGH);
-      
-    }else{
-    
-      resetServo();
-      //digitalWrite(yellowLed,LOW);
   
-  }
 
   checkReceiveSerial++;
   if(checkReceiveSerial > checkReceiveSerialLimit){
     digitalWrite(redLed,LOW); // HM 10 IS NOT ANYMORE RECEIVING
   }
 
-  while (Serial.available()) {
+  //digitalWrite(led,HIGH);
+
+
+  while (mySerial.available()) {
 
       checkReceiveSerial = 0;
 
-      digitalWrite(redLed,HIGH); // RED LIGHT IS TELLING US THAT WE ARE RECEIVING SERIAL
+      digitalWrite(led,HIGH);
 
-      byte b  = Serial.read();
+      //digitalWrite(redLed,HIGH); // RED LIGHT IS TELLING US THAT WE ARE RECEIVING SERIAL
+
+      byte b  = mySerial.read();
       char c = (char)b;
+
+      //Serial.println(c);
 
       // READ BT MESSAGE PROCESS
       if(!messageIsReady && b == startPatternByte){
@@ -363,37 +328,44 @@ void readBTInstructions(int messageIndex,char c){
 
     
     if( c == 'l' )  {
-      //relayTurnClockwise();
-      relayMoveForward();
+      relayTurnClockwise();
+      //relayMoveForward();
       playAnimation = false;
       resetServo();
     }
     if( c == 'r' ){
-      //relayTurnCounterClockwise();
-      relayMoveBackward();
+      relayTurnCounterClockwise();
+      //relayMoveBackward();
       playAnimation = false;
       resetServo();
     }
     if( c == 'd' ){
+      relayMoveForward();
       //relayMoveBackward();
-      relayTurnClockwise();
+      //relayTurnClockwise();
       playAnimation = false;
       resetServo();
     }
     if( c == 'u' ){
+      relayMoveBackward();
       //relayMoveForward();
-      relayTurnCounterClockwise();
+      //relayTurnCounterClockwise();
       playAnimation = false;
       resetServo();
     }
-    if( c == 'x' )  relayIdle();
+    if( c == 'x' ){
+      relayIdle();
+      digitalWrite(yellowLed,HIGH);
+    }
 
   }
 
   if(messageIndex == 1){
     // READ BUTTONS VALUE
    
-    digitalWrite(greenLed,LOW); 
+     
+
+    cycleValue = 0;
 
     if( c == 'x' ){
   
@@ -413,13 +385,13 @@ void readBTInstructions(int messageIndex,char c){
     if( c == '4') {
       resetServo();
       playAnimation = false;
-      
+      relayIdle();
     }
       
   }
 
   if(messageIndex == 2){
-
+    /*
     sliderState = c;
 
     if(buttonState == '1' || buttonState == '2' || buttonState == '3' ){
@@ -427,9 +399,14 @@ void readBTInstructions(int messageIndex,char c){
         //animateMecca(c,buttonState);
     }
 
+    if(buttonState == '4'){
+      //relayIdle();
+    }
+
     if(c == 3){
       digitalWrite(greenLed,HIGH);
     }
+    */
     //digitalWrite(greenLed,HIGH);
  
   }
@@ -453,28 +430,27 @@ void resetServo(){
 }
 
 
-
-
-
-
-
-
-
-
+//////////////////
+// RELAY
+//////////////////
 
 void relayIdle(){
 
    // IDLE
-  actionMoteur(1,0,0); //moteur 1 100% puissance sens 1
-  actionMoteur(2,0,0); //moteur 2 100% puissance sens 1
+   digitalWrite(relayPinA, LOW);
+   digitalWrite(relayPinB, LOW);
+   digitalWrite(relayPinC, LOW);
+   digitalWrite(relayPinD, LOW);
 
 }
 
 void relayTurnClockwise(){
 
     // LEFT
-  actionMoteur(1,-1,100); //moteur 1 100% puissance sens 1
-  actionMoteur(2,1,100); //moteur 2 100% puissance sens 1
+   digitalWrite(relayPinA,HIGH); 
+   digitalWrite(relayPinB,LOW);
+   digitalWrite(relayPinC,LOW);
+   digitalWrite(relayPinD,HIGH);
    
 }
 
@@ -482,8 +458,10 @@ void relayTurnClockwise(){
 void relayTurnCounterClockwise(){
 
    // RIGHT
-  actionMoteur(1,1,100); //moteur 1 100% puissance sens 1
-  actionMoteur(2,-1,100); //moteur 2 100% puissance sens 1
+   digitalWrite(relayPinA,LOW);
+   digitalWrite(relayPinB,HIGH);
+    digitalWrite(relayPinC,HIGH);
+   digitalWrite(relayPinD,LOW); 
     
 }
 
@@ -491,8 +469,10 @@ void relayTurnCounterClockwise(){
 void relayMoveForward(){
 
    // FORWARD
-  actionMoteur(1,1,100); //moteur 1 100% puissance sens 1
-  actionMoteur(2,1,100); //moteur 2 100% puissance sens 1
+   digitalWrite(relayPinA,LOW);
+   digitalWrite(relayPinB,HIGH);
+   digitalWrite(relayPinC,LOW);
+   digitalWrite(relayPinD,HIGH);
 
 }
 
@@ -500,51 +480,31 @@ void relayMoveForward(){
 void relayMoveBackward(){
       
    // BACKWARD
-  actionMoteur(1,-1,100); //moteur 1 100% puissance sens 1
-  actionMoteur(2,-1,100); //moteur 2 100% puissance sens 1
+   digitalWrite(relayPinA,HIGH);
+   digitalWrite(relayPinB,LOW);
+   digitalWrite(relayPinC,HIGH);
+   digitalWrite(relayPinD,LOW);
 
 }
 
-void actionMoteur(int moteur,int sens,int pourcentage){
-  int pin1,etat1,pin2,etat2,pinP,puissance; //variable de la fonction
-  //test numéro du moteur
-  if (moteur==1){
-    pin1=pin1Moteur1;
-    pin2=pin2Moteur1;
-    pinP=pinPMoteur1;
-  }
-  else {
-    pin1=pin1Moteur2;
-    pin2=pin2Moteur2;
-    pinP=pinPMoteur2;
-  }
-  //test sens du moteur 1,-1 (sens contrainre) ou tout autre valeur (stoppe le moteur)
-  if (sens==1){
-    etat1=1;
-    etat2=0;
-  }
-  else if (sens==-1){
-    etat1=0;
-    etat2=1;
-  }
-  else {
-    etat1=0;
-    etat2=0;
-  }
-  puissance=map(pourcentage,0,100,0,255);
-  analogWrite(pinP,puissance);
-  digitalWrite(pin1,etat1);
-  digitalWrite(pin2,etat2);
-  //affichage sur le moniteur série (facultatif)
-  //Serial.print("Moteur : ");
-  //Serial.print(moteur);
-  if (sens==-1 || sens==1){
-    //Serial.print(" sens : ");
-    //Serial.print(sens);
-  }
-  else {
-    //Serial.print(" ! stop ! ");
-  }
-  //Serial.print(" puissance : ");
-  //Serial.println(pourcentage);
+
+void updateServoPosition(MeccaBrain *s,int a, int b, int c){
+
+    s->communicate();
+    s->setServoPosition(0,a);
+    s->setServoPosition(1,b);
+    s->setServoPosition(2,c);
+
+ }
+
+void updateHeadServoPosition(MeccaBrain *h,int a, int b, byte r,byte g ,byte bb, byte d){
+
+    h->communicate();
+    h->setServoPosition(0,a);
+    h->setServoPosition(1,b);
+    h->setLEDColor(r,g,bb,d);
+
 }
+
+
+

@@ -1,8 +1,9 @@
+// The code to upload on Arduino A - the arm/head Servomotors controller 
 #include "MeccaBrain.h"
 
-MeccaBrain head(11);
-MeccaBrain leftArm(12);
-MeccaBrain rightArm(13);
+MeccaBrain head(11); // VIOLET
+MeccaBrain leftArm(12); // GRIS
+MeccaBrain rightArm(13); // BLEU
 
 
 // COMMUNICATION PATTERNS
@@ -225,14 +226,12 @@ MeccaMove animations[12] = {
 };
 
 
-<<<<<<< HEAD
+
 int cycleValueMax = 6; 
 int cycleValue = 0; 
-=======
 
 
       
->>>>>>> e1af4faf6d5e16a8fd60b083239cba0d929a864f
 
 void setup() {
 
@@ -249,6 +248,8 @@ void setup() {
   pinMode(redLed,OUTPUT);
   pinMode(greenLed,OUTPUT);
   pinMode(yellowLed,OUTPUT);
+
+  pinMode(led,OUTPUT);
 
   //DEFAULT POSITION
   relayIdle();
@@ -314,6 +315,8 @@ void loop() {
 
       checkReceiveSerial = 0;
 
+      digitalWrite(led,HIGH); // RED LIGHT IS TELLING US THAT WE ARE RECEIVING SERIAL
+
       digitalWrite(redLed,HIGH); // RED LIGHT IS TELLING US THAT WE ARE RECEIVING SERIAL
 
       byte b  = Serial.read();
@@ -351,9 +354,9 @@ void loop() {
 void readBTInstructions(int messageIndex,char c){
 
   if(messageIndex == 0){
+    /*
     // READ DIRECTION VALUE
     digitalWrite(greenLed,LOW); 
-
     
     if( c == 'l' )  {
       relayTurnClockwise();
@@ -385,6 +388,7 @@ void readBTInstructions(int messageIndex,char c){
       relayIdle();
       digitalWrite(yellowLed,HIGH);
     }
+    */
 
   }
 
