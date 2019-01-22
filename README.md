@@ -4,7 +4,7 @@
 
 ![alt text](https://github.com/sachaamm/meccanoidArduinoUnoShieldProject/blob/master/wikiPictures/meccanoid2.jpg)
 
-youtube link
+https://www.youtube.com/watch?v=WydUIxD037A
 
 ### Hardware
 
