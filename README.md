@@ -2,7 +2,7 @@
 
 ### Overview
 
-![alt text](https://github.com/sachaamm/meccanoidArduinoUnoShieldProject/blob/master/wikiPictures/meccanoid2.png)
+![alt text](https://github.com/sachaamm/meccanoidArduinoUnoShieldProject/blob/master/wikiPictures/meccanoid2.jpg)
 
 youtube link
 
