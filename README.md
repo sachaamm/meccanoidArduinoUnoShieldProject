@@ -11,15 +11,17 @@ youtube link
 - Install Meccanoid Arduino Library ( [provided on this link](http://www.meccano.com/meccanoid-opensource) )
 - Set up your Bluetooth slave-master pairing with an FTDI chip. One device will be Master and the other will be slave.
 ( [check this link](https://www.instructables.com/id/How-to-Use-Bluetooth-40-HM10/?fbclid=IwAR2GLLHkLqt9dNQLBvCo8Qc5vnz0IyvcvLNwDCA6tnjOxEIhA4G5cf7OB1w) )
-- Upload the Arduino Source code on your devices, included in this repository in Arduino/ 
+- Upload the Arduino Source code on your devices, included in this repository in **Arduino/** 
 
-   EsploraBT3/ is for Esplora Controller
+   **EsploraBT3/** is for Esplora Controller
    
-   ReceiveBTEsplora_ArduinoRelay/ is for Arduino A
+   **ReceiveBTEsplora_ArduinoRelay/** is for Arduino A
    
-   ReceiveBTESplora_Servos/ is for Arduino B
+   **ReceiveBTESplora_Servos/** is for Arduino B
   
 - Connect wires following the schematic picture for your 2 Arduino and your HM10 device
+![alt text](https://github.com/sachaamm/meccanoidArduinoUnoShieldProject/blob/master/wikiPictures/eagle_2019-01-22_17-27-22.png)
+
 
 - Connect HM10 master bluetooth device to your Esplora controller following this picture 
 
