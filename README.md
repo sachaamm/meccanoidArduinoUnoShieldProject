@@ -45,16 +45,16 @@ This is the hardware used on this project
 - **Do not connect Meccanoid 5V supply GND to your Arduino B GND**, you will get a short-circuit on your HM10 bluetooth device which may destroy your device.
 - **Do not upload your Arduino code when HM10-Serial connection is occuring** ( on the Arduino A, the HM10 device is connected to the Serial ports,
 DIGITAL 0 (RX) and DIGITAL 1 (TX). 
-- You may plug your motors to the HBridge in a different way than mine. If you get a mismatch on instructions directions, you can edit the Arduino B Code ( ReceiveBTEsplora_ArduinoRelays )
+- You may plug your motors to the HBridge in a different way than mine. If you get a mismatch on instructions directions, you can edit the Arduino B Code ( **ReceiveBTEsplora_ArduinoRelays** )
 - Provide another 5V supply to your Arduino A using the USB port, because this device is controlling relays on a circuit supplied by the Meccanoid 5V supply, we have to supply this Arduino to another current source to avoid short circuits on the HBridge feet motors.
 
 ### Develop
 
-- You can edit your
+- You can edit your own animations by editing the Arduino A Code ( **ReceiveBTEsplora_Servos** )
 
 ### STL Files
 
 2 stl files for 3D printing are provided in order to grab easily your Esplora controller on hands
 
-
+# Have Fun !
 
