@@ -20,7 +20,7 @@ int checkReceiveSerialLimit = 50;
 
 bool messageIsReady = false;
 bool messageIsOver = false;
-int bytesExpected = 3; // direction / animation / slider_state
+int bytesExpected = 4; // direction / animation / slider_state / speed
 bool debugMessageProcess = false;
 
 //RELAY
@@ -29,6 +29,12 @@ int relayPinB = 4;
 int relayPinC = 6;
 int relayPinD = 8;
 bool debugRelay = false;
+
+//PWM SPEED - mosfet
+int mosfetPinA = 3;
+int mosfetPinB = 5;
+int mosfetPinC = 10;
+int mosfetPinD = 11;
 
 
 // ANIMATION
@@ -44,10 +50,13 @@ int led = 13;
 int ledState = HIGH;
 
 // DEBUG LEDs
-int redLed = 7;
-int greenLed = 8;
+int redLed = A0;
+int greenLed = A1;
 int yellowLed = 9;
 
+
+
+char saveDirection = 'x';
 
 // %ECCA MOVE : a simple keyframe servoPos interpolation
 struct MeccaMove{
@@ -156,7 +165,7 @@ MeccaMove animations[12] = {
     { 220 , 230 , 66, 200,220 , 66 ,210 , 220},
     { 120 , 120 , 66 , 66, 66 ,66 ,120,120 },
     { 120 , 20 , 66 , 66 , 66 , 120 , 120 , 120},
-    { 7,0,0,2}
+    { 7,0,0,2 }
   },
 
   // 3b : CONDUCTOR     GREEN
@@ -182,7 +191,7 @@ MeccaMove animations[12] = {
     { 220 , 230 , 220, 200,220 , 200 ,210 , 220},
     { 120 , 120 , 120 , 120, 120 ,120 ,120,120 },
     { 120 , 120, 120 , 120 , 120 , 120 , 120 , 120},
-    { 5,3,2,4}
+    { 5,3,2,4 }
   },
 
   // 4a HEAD ONLY    RED
@@ -195,7 +204,7 @@ MeccaMove animations[12] = {
     { 100 , 100 , 100 , 100, 100, 100 , 100 , 100 },
     { 50 , 120 , 120 , 220, 120 ,120 ,120,120 },
     { 120 , 120, 120 , 150 , 150 , 120 , 120 , 120},
-    { 6,3,4,5  }
+    { 6,3,4,5 }
   },
 
   // 4b WARM UP     RED
@@ -221,7 +230,7 @@ MeccaMove animations[12] = {
     { 230 , 200 , 230, 160,200 , 200 ,200 , 200},
     { 150 , 130 , 150 , 150, 130 ,150 ,150,150 },
     { 150 , 150, 130 , 150 , 150 , 130 , 150 , 150 },
-    { 7,7,7,7}
+    { 7,7,7,7 }
   }
 };
 
@@ -250,6 +259,14 @@ void setup() {
   pinMode(relayPinC, OUTPUT);
   pinMode(relayPinD, OUTPUT);
 
+  // motor Speed
+  pinMode(mosfetPinA,OUTPUT);
+  pinMode(mosfetPinB,OUTPUT);
+  pinMode(mosfetPinC,OUTPUT);
+  pinMode(mosfetPinD,OUTPUT);
+  
+  
+
   //LEDS to OUTPUT
   pinMode(redLed,OUTPUT);
   pinMode(greenLed,OUTPUT);
@@ -277,17 +294,21 @@ void loop() {
 
   //digitalWrite(led,HIGH);
 
+//analogWrite(redLed,255);
 
-  while (mySerial.available()) {
+  while (Serial.available()) {
 
       checkReceiveSerial = 0;
 
-      digitalWrite(led,HIGH);
+      analogWrite(redLed,255);
 
       //digitalWrite(redLed,HIGH); // RED LIGHT IS TELLING US THAT WE ARE RECEIVING SERIAL
 
-      byte b  = mySerial.read();
+      byte b  = Serial.read();
       char c = (char)b;
+      int i = (int)b;
+
+      
 
       //Serial.println(c);
 
@@ -301,7 +322,7 @@ void loop() {
 
           if(messageByteIndex < bytesExpected){
           
-            readBTInstructions(messageByteIndex,c); // READ BT DATA INSTRUCTIONS
+            readBTInstructions(messageByteIndex,c,i); // READ BT DATA INSTRUCTIONS
             messageByteIndex++;
             
           }else{
@@ -320,21 +341,23 @@ void loop() {
 
 }
 
-void readBTInstructions(int messageIndex,char c){
+void readBTInstructions(int messageIndex,char c,int i){
 
   if(messageIndex == 0){
     // READ DIRECTION VALUE
-    digitalWrite(greenLed,LOW); 
-
+    //digitalWrite(greenLed,LOW); 
+    saveDirection = c;
     
     if( c == 'l' )  {
-      relayTurnClockwise();
+      relayTurnCounterClockwise();
+      //relayTurnClockwise();
       //relayMoveForward();
       playAnimation = false;
       resetServo();
     }
     if( c == 'r' ){
-      relayTurnCounterClockwise();
+      relayTurnClockwise();
+      //relayTurnCounterClockwise();
       //relayMoveBackward();
       playAnimation = false;
       resetServo();
@@ -391,24 +414,32 @@ void readBTInstructions(int messageIndex,char c){
   }
 
   if(messageIndex == 2){
-    /*
-    sliderState = c;
-
-    if(buttonState == '1' || buttonState == '2' || buttonState == '3' ){
-        playAnimation = true;
-        //animateMecca(c,buttonState);
-    }
-
-    if(buttonState == '4'){
-      //relayIdle();
-    }
-
-    if(c == 3){
-      digitalWrite(greenLed,HIGH);
-    }
-    */
-    //digitalWrite(greenLed,HIGH);
+    // SLIDER STATE, USED FOR SERVOS, NOT HERE.
  
+  }
+
+  if(messageIndex == 3){
+
+    analogWrite(greenLed,120);
+    
+    // SET THE SPEED
+/*
+    if(saveDirection == 'u' || saveDirection == 'r'){
+      analogWrite(mosfetPinA, i);
+      analogWrite(mosfetPinB, 0);
+    }
+
+    if(saveDirection == 'd' || saveDirection == 'l'){
+      analogWrite(mosfetPinA, 0);
+      analogWrite(mosfetPinB, i);
+          
+    }
+
+    */
+      analogWrite(mosfetPinA, i);
+      analogWrite(mosfetPinB, i);
+    analogWrite(mosfetPinC, i);
+    analogWrite(mosfetPinD, i);
   }
 
   

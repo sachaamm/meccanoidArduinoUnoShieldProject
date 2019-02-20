@@ -8,7 +8,7 @@ int hm10Rx = 7;  // RX-I pin of hm10 mate, Arduino D7
 
 SoftwareSerial hm10(hm10Tx, hm10Rx);
 
-int thresholdJoystick = 500;
+int thresholdJoystick = 20;
 
 
 
@@ -20,6 +20,8 @@ char directionJoystick = 'x'; // default = idle // l : LEFT / r : RIGHT / u : UP
 char buttonValue = 'x'; // default = none // 1 : UP / 2 : LEFT / 3 : RIGHT / 4 : DOWN
 
 int sliderState = 0;
+
+int speedValue = 0;
 
 
 void setup()
@@ -66,10 +68,45 @@ void loop()
   readButtonState(buttonDown,SWITCH_DOWN,'4');
 
 
-  if(xValue > thresholdJoystick && xValue > yValue) directionJoystick = 'l'; // MOVE TO LEFT
-  if(xValue < -thresholdJoystick && xValue < yValue)  directionJoystick = 'r'; // MOVE TO RIGHT
-  if(yValue > thresholdJoystick && yValue > xValue) directionJoystick = 'd'; // MOVE BACKWARD
-  if(yValue < -thresholdJoystick && yValue < xValue)  directionJoystick = 'u'; // MOVE FORWARD
+  if(xValue > thresholdJoystick && xValue > yValue){
+    directionJoystick = 'l'; // MOVE TO LEFT
+    Serial.println("xVal");
+    Serial.println(xValue);
+
+    speedValue = map(abs(xValue),thresholdJoystick,512,0,255);
+
+    Serial.println(speedValue);
+    
+  }
+  if(xValue < -thresholdJoystick && xValue < yValue) {
+    directionJoystick = 'r'; // MOVE TO RIGHT
+    Serial.println("xVal");
+    Serial.println(xValue);
+
+    speedValue = map(abs(xValue),thresholdJoystick,512,0,255);
+
+    Serial.println(speedValue);
+    
+  }
+  if(yValue > thresholdJoystick && yValue > xValue){
+    directionJoystick = 'd'; // MOVE BACKWARD
+    Serial.println("yVal");
+    Serial.println(yValue);
+
+    speedValue = map(abs(yValue),thresholdJoystick,512,0,255);
+
+    Serial.println(speedValue);
+    
+  }
+  if(yValue < -thresholdJoystick && yValue < xValue){
+    directionJoystick = 'u'; // MOVE FORWARD
+    Serial.println("yVal");
+    Serial.println(yValue);
+
+    speedValue = map(abs(yValue),thresholdJoystick,512,0,255);
+
+    Serial.println(speedValue);
+  }
 
   if(directionJoystick != 'x'){
     
@@ -135,6 +172,7 @@ void sendBTMessage(){
   hm10.write(directionJoystick);
   hm10.write(buttonValue);
   hm10.write(sliderState);
+  hm10.write(speedValue);
   hm10.write(endPatternByte);
   //sendEndPattern();
 

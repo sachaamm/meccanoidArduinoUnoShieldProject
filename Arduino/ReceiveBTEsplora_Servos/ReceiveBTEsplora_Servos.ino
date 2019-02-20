@@ -5,6 +5,9 @@ MeccaBrain head(11); // VIOLET
 MeccaBrain leftArm(12); // GRIS
 MeccaBrain rightArm(13); // BLEU
 
+int pwmSpeed = 255;
+
+
 
 // COMMUNICATION PATTERNS
 byte startPatternByte = 'a';
@@ -20,7 +23,7 @@ int checkReceiveSerialLimit = 50;
 
 bool messageIsReady = false;
 bool messageIsOver = false;
-int bytesExpected = 3; // direction / animation / slider_state
+int bytesExpected = 4; // direction / animation / slider_state / speed
 bool debugMessageProcess = false;
 
 //RELAY
@@ -44,7 +47,7 @@ int led = 13;
 int ledState = HIGH;
 
 // DEBUG LEDs
-int redLed = 7;
+int redLed = A0;
 int greenLed = 8;
 int yellowLed = 9;
 
@@ -317,7 +320,7 @@ void loop() {
 
       digitalWrite(led,HIGH); // RED LIGHT IS TELLING US THAT WE ARE RECEIVING SERIAL
 
-      digitalWrite(redLed,HIGH); // RED LIGHT IS TELLING US THAT WE ARE RECEIVING SERIAL
+      analogWrite(redLed,255); // RED LIGHT IS TELLING US THAT WE ARE RECEIVING SERIAL
 
       byte b  = Serial.read();
       char c = (char)b;
