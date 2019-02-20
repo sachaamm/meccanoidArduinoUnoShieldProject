@@ -4,7 +4,7 @@
 
 ![alt text](https://github.com/sachaamm/meccanoidArduinoUnoShieldProject/blob/master/wikiPictures/meccanoid2.jpg)
 
-youtube link
+https://www.youtube.com/watch?v=WydUIxD037A
 
 ### Hardware
 
@@ -30,8 +30,8 @@ This is the hardware used on this project
    
    **ReceiveBTESplora_Servos/** is for Arduino B
   
-- Connect wires following the schematic picture for your 2 Arduino and your HM10 device
-![alt text](https://github.com/sachaamm/meccanoidArduinoUnoShieldProject/blob/master/wikiPictures/eagle_2019-01-22_17-27-2222.png)
+- Connect wires and devices following the schematic picture for your 2 Arduino and your HM10 device
+![alt text](https://github.com/sachaamm/meccanoidArduinoUnoShieldProject/blob/master/wikiPictures/eagleSchematic.png)
 
 
 - Connect HM10 master bluetooth device to your Esplora controller following this picture 
